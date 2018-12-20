@@ -106,11 +106,11 @@ resultRosettaMCFS=rosetta(TARGET_GE_Classifier_MCFS,classifier="StandardVoter",d
 
 recalculatedResultRosettaMCFS=recalculateRules(TARGET_GE_Classifier_MCFS,resultRosettaMCFS$main)
 
-write.csv(recalculatedResultRosettaMCFS,paste("ResultsRules/AllGenes/RulesAllGenes-",substr(date(),1,10),".csv",sep=""))
-saveLineByLine(recalculatedResultRosettaMCFS,  paste("ResultsRules/AllGenes/NetworksAllGenes-",substr(date(),1,10),".txt",sep=""))
+#write.csv(recalculatedResultRosettaMCFS,paste("ResultsRules/AllGenes/RulesAllGenes-",Sys.Date(),".csv",sep=""))
+#saveLineByLine(recalculatedResultRosettaMCFS,  paste("ResultsRules/AllGenes/NetworksAllGenes-",Sys.Date(),".txt",sep=""))
 
-write.csv(recalculatedResultRosettaMCFS,paste("ResultsRules/ProteinCoding/RulesAllGenes-",substr(date(),1,10),".csv",sep=""))
-saveLineByLine(recalculatedResultRosettaMCFSGenetic, paste("ResultsRules/AllGenes/NetworksAllGenes-",substr(date(),1,10),".txt",sep=""))
+write.csv(recalculatedResultRosettaMCFS,paste("ResultsRules/ProteinCoding/RulesAllGenes-",Sys.Date(),".csv",sep=""))
+saveLineByLine(recalculatedResultRosettaMCFSGenetic, paste("ResultsRules/AllGenes/NetworksAllGenes-",Sys.Date(),".txt",sep=""))
 
 resultRosettaMCFSGenetic=rosetta(TARGET_GE_Classifier_MCFS,classifier="StandardVoter",discrete=FALSE, discreteMethod="EqualFrequency", discreteParam=3,reducer="Genetic",ruleFiltration=TRUE, ruleFiltrAccuracy=c(0,0.8),ruleFiltrSupport=c(1,3))
 #resultRosettaMCFSGenetic=rosetta(TARGET_GE_Classifier_MCFS,classifier="StandardVoter",discrete=FALSE, discreteMethod="EqualFrequency", discreteParam=3,reducer="Genetic")
@@ -121,11 +121,14 @@ saveLineByLine(recalculatedResultRosettaMCFSGenetic, "ResultsRules/AllGenes/Netw
 resultRosettaBoruta=rosetta(TARGET_GE_Classifier_Boruta,classifier="StandardVoter",discrete=FALSE, discreteMethod="EqualFrequency", discreteParam=3)
 clusteredRulesMCFS=clusterRules(recalculatedResultRosettaMCFS,rownames(TARGET_GE_Classifier_MCFS))
 colnames(clusteredRulesMCFS)<-plotNames
-my.plots=vector(1, mode='list');
-svg(paste("ResultsRules/AllGenes/HeatMapAllGenes-",substr(date(),1,10),".svg",sep=""))
-clusters=heatmap.F(t(clusteredRulesMCFS), colors=c('white','white','white','white','blue','blue'),distmethod='pearson')
-dev.off()
-write.csv(clusters,paste("ResultsRules/AllGenes/Clusters-",substr(date(),1,10),".csv",sep = ""))
-my.plots[[1]]=recordPlot()
-savePDF(my.plots,paste("HeatMapAllGenes-",substr(date(),1,10),sep=""),"ResultsRules/AllGenes/")
 
+
+#my.plots=vector(1, mode='list');
+#svg(paste("ResultsRules/AllGenes/HeatMapAllGenes-",Sys.Date(),".svg",sep=""))
+#clusters=heatmap.F(t(clusteredRulesMCFS), colors=c('white','white','white','white','blue','blue'),distmethod='pearson')
+#dev.off()
+#write.csv(clusters,paste("ResultsRules/AllGenes/Clusters-",Sys.Date(),".csv",sep = ""))
+#my.plots[[1]]=recordPlot()
+#savePDF(my.plots,paste("HeatMapAllGenes-",Sys.Date(),"ResultsRules/AllGenes/"))
+
+writeOutput("ResultsRules/",Sys.Date(),"AllGenes",clusteredRulesMCFS)

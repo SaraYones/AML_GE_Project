@@ -124,6 +124,7 @@ plotPCAmeta=function(GE,metadata,variable,filepath,discretizemethod)
   graphics.off()
   
 }
+#-------------------Output Functions---------------------------------
 
 savePDF=function(myplots,variable,filepath,discretizemethod="")
 {
@@ -139,6 +140,28 @@ savePDF=function(myplots,variable,filepath,discretizemethod="")
   graphics.off()
   
 }
+
+writeOutput=function(path,date,folder,clusteredRulesMCFS)
+{
+  #Create folder in the path
+  dir.create(paste(path,date,sep=""))
+  ifelse(!dir.exists(paste(path,date,"/",folder,sep="")), dir.create(paste(path,date,"/",folder,sep="")), FALSE)
+  
+  #dir.create(paste(path,date,folder,sep=""))
+  temp=paste(path,date,"/",folder,sep="")
+  write.csv(recalculatedResultRosettaMCFS,paste(temp,"/RulesAllGenes-",Sys.Date(),".csv",sep=""))
+  saveLineByLine(recalculatedResultRosettaMCFS,  paste(temp,"/NetworksAllGenes-",Sys.Date(),".txt",sep=""))
+  
+  my.plots=vector(1, mode='list');
+  svg(paste(temp,"/HeatMapAllGenes-",Sys.Date(),".svg",sep=""))
+  clusters=heatmap.F(t(clusteredRulesMCFS), colors=c('white','white','white','white','blue','blue'),distmethod='pearson')
+  write.csv(clusters,paste(temp,"/Clusters-",Sys.Date(),".csv",sep = ""))
+  my.plots[[1]]=recordPlot()
+  savePDF(my.plots,paste("HeatMapAllGenes",Sys.Date()),paste(temp,"/",sep=""))
+  #  dev.off()
+  
+}
+
 
 discretizeAge=function(values,method)
 {
