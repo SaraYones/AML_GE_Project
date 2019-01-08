@@ -198,6 +198,36 @@ plotDistributionCategory=function(GE,titles,variable,filepath,discretizemethod)
   graphics.off()
   
 }
+#For TARGET AML project
+#Plot clusters Vs Metadata 
+plotClustersMetadataPlot=function(ordered_metadata_for_exploratory,clusters,meta,color)
+{
+ # vec = NULL
+  myplots <- list()  # new empty list
+  
+   for (i in 1:length(meta))
+        local({
+            i <- i
+            theme_set(theme_cowplot(font_size=4)) # reduce default font size
+            
+              p1 <- qplot(ordered_metadata_for_exploratory[which(ordered_metadata_for_exploratory[,"clusters"]=="red"),meta[i]], as.factor(rownames(ordered_metadata_for_exploratory)[which(ordered_metadata_for_exploratory[,"clusters"]=="red")]),colour = I("red"),xlab = meta[i], ylab = "samples")+theme(plot.background=element_rect(fill="white", colour=NA))#+theme(plot.margin=grid::unit(c(0,0,0,0), "mm"))
+              
+                print(i)
+             print(p1)
+             myplots[[i]] <<- p1  # add each plot into plot list
+         })
+   #multiplot(plotlist = myplots ,ncol=2,nrow=6)
+  # ggarrange(plotlist =  myplots ,ncol=2,nrow=5)
+ # pdf(paste(getwd(),"red",".pdf",sep=""), onefile=TRUE)
 
+  # The solution to the overlaying problem that used to take place in multiple grid was setting the base_aspect_ratio
+  plot2by2=plot_grid(plotlist = myplots ,labels="auto", label_size=4,align="l")
+   save_plot("plot2by2.png", plot2by2,base_aspect_ratio=1.5
+           #  ncol = 2, # we're saving a grid plot of 2 columns
+           #  nrow = 2, # and 2 rows
+             # each individual subplot should have an aspect ratio of 1.3
+            # base_aspect_ratio = 1.3
+   )
+}
 
 

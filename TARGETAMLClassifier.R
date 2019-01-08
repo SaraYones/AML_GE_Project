@@ -131,4 +131,15 @@ colnames(clusteredRulesMCFS)<-plotNames
 #my.plots[[1]]=recordPlot()
 #savePDF(my.plots,paste("HeatMapAllGenes-",Sys.Date(),"ResultsRules/AllGenes/"))
 
-writeOutput("ResultsRules/",Sys.Date(),"AllGenes",clusteredRulesMCFS)
+ordered_metadata_for_exploratory=writeOutput("ResultsRules/",Sys.Date(),"AllGenes",clusteredRulesMCFS)
+
+#Merge output clusters with metadata exploratory
+#paste "TARGET-20-  to the names of the clusters then match it with the name of the clusters, get the values and add it to a new coloumn in metadata_exploratory
+metadata_for_exploratory$clusters=clusters[match(rownames(metadata_for_exploratory),paste(rep("TARGET-20-",length(clusters)),names(clusters),sep=""))]
+#Order based on the order of the clusters 
+i1=match(paste(rep("TARGET-20-",length(clusters)),names(clusters),sep=""),rownames(metadata_for_exploratory))
+ordered_metadata_for_exploratory=metadata_for_exploratory[i1,]
+
+
+plotClustersMetadataPlot(ordered_metadata_for_exploratory,unique(clusters),c("Protocol","FAB.Category","t.8.21.","inv.16.","MLL","FLT3.ITD.positive.","NPM.mutation","CEBPA.mutation","WT1.mutation","CR.status.at.end.of.course.1"),"red")
+plotClustersMetadataPlot(ordered_metadata_for_exploratory,unique(clusters),c("Protocol","FAB.Category","t.8.21.","inv.16.","MLL","FLT3.ITD.positive.","NPM.mutation","CEBPA.mutation","WT1.mutation","CR.status.at.end.of.course.1"),"red")
