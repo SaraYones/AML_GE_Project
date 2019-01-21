@@ -19,6 +19,7 @@ plotPCAmeta=function(GE,metadata,variable,filepath,discretizemethod)
       
     }
     
+   
     
     
     #print(GE[i])
@@ -35,6 +36,22 @@ plotPCAmeta=function(GE,metadata,variable,filepath,discretizemethod)
   }
   graphics.off()
   
+}
+
+discretizeAge=function(values,method)
+{
+  
+  #if using SLE
+  # age=as.numeric(gsub("(age: (([0-9]*[.])?[0-9]+))","\\2",values))
+  #if using AML data
+  age=values
+  print(age)
+  #For AML
+  discretizedAgeFrequency=discretize(age,method = method, breaks = 3,  labels = c("infants", "child","AYA"))
+  #For SLE
+  #discretizedAgeFrequency=discretize(age,method = method, breaks = 4,  labels = c("young", "youth","adult","senior"))
+  
+  return(discretizedAgeFrequency)
 }
 
 
@@ -58,13 +75,21 @@ plotPCA= function(filepath,GeneExpressionMatrixlocal,Groups,variable){
                 circle = FALSE,var.axes = FALSE)
   g <- g + scale_color_discrete(name = variable)
   g <- g + theme(legend.direction = 'horizontal', 
-                 legend.position = 'top')
+                 legend.position = 'top',panel.background = element_rect(fill = "lightgray",
+                                                                       # colour = "lightgray",
+                                                                         size = 0.2, linetype = "solid"),
+                 panel.grid.major = element_line(size = 0.2, linetype = 'solid',
+                                                 colour = "white"), 
+                 panel.grid.minor = element_line(size = 0.2, linetype = 'solid',
+                                                 colour = "white")
+  )
   #print(g)
   #dev.off()
   plot(g)
   myplots=recordPlot()
   return(myplots)
 }
+
 
 plotVenn=function(geneLS,parameters)
 {
@@ -200,18 +225,21 @@ plotDistributionCategory=function(GE,titles,variable,filepath,discretizemethod)
 }
 #For TARGET AML project
 #Plot clusters Vs Metadata 
-plotClustersMetadataPlot=function(ordered_metadata_for_exploratory,clusters,meta,color)
+plotClustersMetadataPlot=function(ordered_metadata_for_exploratory,clusters,meta,path,date,folder)
 {
  # vec = NULL
   myplots <- list()  # new empty list
-  
-   for (i in 1:length(meta))
+  for (j in 1:length(meta))
+{   for (i in 1:length(clusters))#i in 1:length(meta))
         local({
             i <- i
             theme_set(theme_cowplot(font_size=4)) # reduce default font size
+            # The first is for plotting 1 color group for all meta data variables
+             # p1 <- qplot(ordered_metadata_for_exploratory[which(ordered_metadata_for_exploratory[,"clusters"]=="red"),meta[i]], as.factor(rownames(ordered_metadata_for_exploratory)[which(ordered_metadata_for_exploratory[,"clusters"]=="red")]),colour = I("red"),xlab = meta[i], ylab = "samples")+theme(plot.background=element_rect(fill="white", colour=NA))#+theme(plot.margin=grid::unit(c(0,0,0,0), "mm"))
+           #The second for plotting all color group for just 1 meta data variable at a time
             
-              p1 <- qplot(ordered_metadata_for_exploratory[which(ordered_metadata_for_exploratory[,"clusters"]=="red"),meta[i]], as.factor(rownames(ordered_metadata_for_exploratory)[which(ordered_metadata_for_exploratory[,"clusters"]=="red")]),colour = I("red"),xlab = meta[i], ylab = "samples")+theme(plot.background=element_rect(fill="white", colour=NA))#+theme(plot.margin=grid::unit(c(0,0,0,0), "mm"))
-              
+             p1 <- qplot(ordered_metadata_for_exploratory[which(ordered_metadata_for_exploratory[,"clusters"]==as.character(clusters[i])),as.character(meta[j])], as.factor(rownames(ordered_metadata_for_exploratory)[which(ordered_metadata_for_exploratory[,"clusters"]==as.character(clusters[i]))]),colour = I(as.character(clusters[i])),xlab = meta[j], ylab = "samples")+theme(plot.background=element_rect(fill="white", colour=NA))#+theme(plot.margin=grid::unit(c(0,0,0,0), "mm"))
+            
                 print(i)
              print(p1)
              myplots[[i]] <<- p1  # add each plot into plot list
@@ -221,13 +249,16 @@ plotClustersMetadataPlot=function(ordered_metadata_for_exploratory,clusters,meta
  # pdf(paste(getwd(),"red",".pdf",sep=""), onefile=TRUE)
 
   # The solution to the overlaying problem that used to take place in multiple grid was setting the base_aspect_ratio
-  plot2by2=plot_grid(plotlist = myplots ,labels="auto", label_size=4,align="l")
-   save_plot("plot2by2.png", plot2by2,base_aspect_ratio=1.5
+    dir.create(paste(path,date,"/",folder,"/","MetaData-Clusters",sep = ""))
+    
+   plot2by2=plot_grid(plotlist = myplots ,labels="auto", label_size=4,align="l")
+   save_plot(paste(path,date,"/",folder,"/","MetaData-Clusters","/",as.character(meta[j]),"-",date,".png",sep=""), plot2by2,base_aspect_ratio=1.5
            #  ncol = 2, # we're saving a grid plot of 2 columns
            #  nrow = 2, # and 2 rows
              # each individual subplot should have an aspect ratio of 1.3
             # base_aspect_ratio = 1.3
    )
+  }
 }
 
 

@@ -26,7 +26,7 @@ compareAccuracies=function(Decisiontable,limit,features)
     #For SLE 
     #resultRosetta=rosetta(Decisiontable[,append(features[1:i],"decision")],classifier="StandardVoter",discreteMask=TRUE,discrete = TRUE,ruleFiltration=TRUE,ruleFiltrSupport=c(1,3))
     #FOR AML
-    resultRosetta=rosetta(Decisiontable[,append(features[1:i],"decision")],classifier="StandardVoter",discrete=FALSE, discreteMethod="EqualFrequency", discreteParam=3)
+    resultRosetta=rosetta(Decisiontable[,append(features[1:i],"decision")],classifier="StandardVoter",discrete=FALSE, discreteMethod="Naive", discreteParam=3)
     
     Accuracies=append(Accuracies,resultRosetta$quality$Accuracy.Mean)
   }

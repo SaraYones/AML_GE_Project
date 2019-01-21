@@ -22,7 +22,7 @@ RelapseMatrix=readQuantification(as.character(files[,2]),paste(samples,"-R",sep=
 decision=append(decision,rep("Relapse1",dim(RelapseMatrix)[1]))
 TARGET_GE_Classifier=as.data.frame(rbind(TumorMatrix,RelapseMatrix))
 TARGET_GE_Classifier=normalizeGE(TARGET_GE_Classifier,as.factor(decision))
-#logTARGET_GE_CLassifier=TARGET_GE_CLassifier+0.00001
+#logTARGET_GE_CLassifier=TARGET_GE_Classifier+0.00001
 #logTARGET_GE_CLassifier=log2(logTARGET_GE_CLassifier)
 #-----------------All Data even if they are unmatched------------------------------------------------
 files<-read.xlsx("TARGET_AML_SampleMatrix_Discovery_20180118.xlsx",header = FALSE, sheetName = "Diagnosis")
@@ -45,7 +45,7 @@ metadata=read.xlsx("harmonized/TARGET_AML_Discovery_ClinicalData_20170525.xlsx",
 metadata_matched=metadata[which(metadata[,"TARGET.USI"] %in% samples ),]
 
 
-exploreSamples(list(as.data.frame(logTARGET_GE_CLassifier)),list("Diagnosis/Relapse"),NULL,getwd(),"ExploreSamples")
+exploreSamples(list(as.data.frame(TARGET_GE_Classifier)),list("Diagnosis/Relapse"),NULL,getwd(),"ExploreSamples")
 plotPCAmeta(list(as.data.frame(TARGET_GE_Classifier)),list(as.data.frame(metadata_matched)),"Gender",getwd(),"")
 plotPCAmeta(list(as.data.frame(TARGET_GE_Classifier)),list(as.data.frame(metadata_matched)),"Race",getwd(),"")
 plotPCAmeta(list(as.data.frame(TARGET_GE_Classifier)),list(as.data.frame(metadata_matched)),"Ethnicity",getwd(),"")
