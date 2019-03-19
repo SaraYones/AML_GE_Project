@@ -51,4 +51,21 @@ annotateInOrder=function(filteredMCFS,Features)
   
 }
 
+annotateDecisionTable=function(decisiontable,genes)
+{
+  
+  AllGenes=getAnnotatedGenes(genes,colnames(decisiontable))
+  
+  AllGenes_ENSMBL=append(AllGenes[[1]]$geneID,AllGenes[[2]])
+  
+  colnames=annotateInOrder(AllGenes,colnames(decisiontable))
+  
+ decisiontable_Annotated=decisiontable
+  colnames(decisiontable_Annotated)<-colnames
+  
+  return(decisiontable_Annotated)
+  
+}
+
+
 

@@ -1,3 +1,5 @@
+
+#This function is sepecific for fredrik script so dont use it 
 f.FeatureHeatmap = function(rule.table){
   fe.x = strsplit(rule.table[,"FEATURES"], split=",")
   con.x = strsplit(rule.table[,"CUTS_COND"], split=",")
@@ -22,6 +24,7 @@ f.FeatureHeatmap = function(rule.table){
 }
 
 
+#This is the heat map function
 
 library(gplots)
 library(dynamicTreeCut)

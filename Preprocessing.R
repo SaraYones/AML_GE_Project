@@ -170,23 +170,43 @@ readQuantification =function(files,samples,filepath){
 }
 
 
-normalizeGE=function(GeneExpression,group)
+normalizeGE=function(GeneExpression,group,remove,logflag)
 {#GeneExpression=TARGET_GE_Classifier
   #LAMLGE=t(GeneExpression)
   remove_cols=nearZeroVar(GeneExpression)
   #group=decision
   #cpmd=cpm(t((GeneExpression[,-remove_cols])))
   cpmd=t((GeneExpression[,-remove_cols]))
+  
+  if(remove==TRUE)
+  {
+  
   dge <- DGEList(counts=cpmd,group=group)
   keep <- rowSums(cpm(dge)>1) >= 2
   dge <- dge[keep, , keep.lib.sizes=FALSE]
   dge <- calcNormFactors(dge, method="TMM")
   dge <- estimateCommonDisp(dge)
-  dge<-cpm(dge$pseudo.counts,log=TRUE)
   
+  }else{
+  #  cpmd=t(GeneExpression)
+    dge <- DGEList(counts=cpmd, group=group)
+    dge <- calcNormFactors(dge, method="TMM")
+    dge <- estimateCommonDisp(dge)
+      #dge<-cpm(dge$pseudo.counts)
+    }
+
+    if(logflag==TRUE)
+    {
+      dge<-cpm(dge$pseudo.counts,log=TRUE)
+    }else{
+      dge<-cpm(dge$pseudo.counts) 
+      }
+
   #dge <- DGEList(counts=cpmd,group=group)
   LAMLGEClassifier=as.data.frame(t(dge))
   View(LAMLGEClassifier)
   dim(LAMLGEClassifier)
   return(LAMLGEClassifier)
 }
+
+

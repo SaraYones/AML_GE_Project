@@ -260,5 +260,33 @@ plotClustersMetadataPlot=function(ordered_metadata_for_exploratory,clusters,meta
    )
   }
 }
+plotEnrichment=function(enriched,titleGO,temp)
+{
+  
+ 
+  
+ # my.plots <- vector(length(GE), mode='list')
+  
+#  graphics.off()
+ 
+ # pdf(temp)
+  dotplot(enriched, showCategory=30,title=titleGO)
+ # dev.off()
+  
+}
 
-
+plotGeneRulesEnrichment=function(RosettaEnrichment,path,date,folder)
+{
+  
+  #RosettaEnrichment=TARGET_ReleventBP
+  temp=getAnnotatedGenes(genes,as.character(RosettaEnrichment$features))
+  print(RosettaEnrichment$features)
+  print(unlist(RosettaEnrichment$features))
+  print(temp)
+  temp=annotateInOrder(temp,unlist(RosettaEnrichment$features))
+ RosettaEnrichment$features=temp
+  BP=RosettaEnrichment$BP
+  p1 <-qplot(as.character(RosettaEnrichment$features), as.factor(as.character(BP)),xlab = "Feature", ylab = "Biological Process")+theme(text = element_text(size=10), axis.text.x = element_text(angle=90, hjust=1),plot.background=element_rect(fill="white", colour=NA))#+theme(plot.margin=grid::unit(c(0,0,0,0), "mm"))
+  save_plot(paste(path,date,"/",folder,"/","Gene-RulesEnrichment","-",date,".png",sep=""), p1,base_aspect_ratio=1.5)
+            
+}
