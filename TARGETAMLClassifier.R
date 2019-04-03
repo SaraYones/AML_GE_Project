@@ -24,7 +24,7 @@ write.table(TARGET_GE_Classifier_nonpseudo,"MCFS_AML_GE_Classifier",row.names=TR
 #matched 4 folder is output of MCFS for protein coding and unannotated genes after filtering according edgeR
 #matched 5 is output of MCFS for non pseudo genes after filtering according edgeR
 MCFSFeatures=FilterFeatures("MCFSoutput/matched 4/matched__RI.csv",200)
-MCFSFeatures=FilterFeatures("MCFSoutput/matched 3/matched__RI.csv",200)
+MCFSFeatures=FilterFeatures("MCFSoutput/matched 3/matched__RI.csv",1000)
 MCFSFeatures=FilterFeatures("MCFSoutput/matched5/matched5__RI.csv",200)
 
 MCFSFeaturesnonpseudo=FilterFeatures("MCFSoutput/matched5/matched5__RI.csv",200)
@@ -170,6 +170,22 @@ i1=match(paste(rep("TARGET-20-",length(clusters)),names(clusters),sep=""),rownam
 ordered_metadata_for_exploratory=metadata_for_exploratory[i1,]
 
 plotClustersMetadataPlot(ordered_metadata_for_exploratory,unique(clusters),c("Protocol","FAB.Category","t.8.21.","inv.16.","MLL","FLT3.ITD.positive.","NPM.mutation","CEBPA.mutation","WT1.mutation","CR.status.at.end.of.course.1"),"ResultsRules/","2019-01-07","AllGenes")
+
+
+#Gene Enrichment Analysis
+
+enrichmentTARGET=GOenrichment(MCFSFeatures,colnames(TARGET_GE_Classifier)[1:length(TARGET_GE_Classifier)-1],"ENSEMBL")
+TARGET_ReleventBP=findReleventBP(enrichmentTARGET,append(MCFSFeatures[1:20],"decision"),TARGET_GE_Classifier,1.0)
+
+BP=unique(sapply(as.data.frame(enrichmentTARGET)$Description, function(x) x))
+
+plotEnrichment(enrichmentTARGET,"Enrichment Pediatric cohort All Genes","ResultsRules/AllGenes/.csv")
+plotGeneRulesEnrichment(TARGET_ReleventBP,"ResultsRules/","2019-01-07","AllGenes")
+
+
+
+
+plotEnrichment(enrichmentTARGET,"Enrichment TARGET All Genes","recalculatedResultRosettaMCFS","ResultsRules/AllGenes/.csv")
 #--------------------------------------------------------------------------------------------------
 #-------------------------Classifier On Metadata-------------------------------------------------
 i2=match(rownames(TARGET_GE_Classifier_MCFS),rownames(metadata_for_exploratory))

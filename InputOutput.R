@@ -15,14 +15,15 @@ savePDF=function(myplots,variable,filepath,discretizemethod="")
 
 #Write output for AML project (Gene expression)
 
-writeOutput=function(path,date,folder,clusteredRulesMCFS,recalculatedResultRosettalocal,rules,enrichment,enrichmentTitle,flag)
+writeOutput=function(path,date,folder1,folder2,clusteredRulesMCFS,recalculatedResultRosettalocal,rules,enrichment,enrichmentTitle,flag)
 {
   #Create folder in the path
-  dir.create(paste(path,date,sep=""))
-  ifelse(!dir.exists(paste(path,date,"/",folder,sep="")), dir.create(paste(path,date,"/",folder,sep="")), FALSE)
-  
+  ifelse(!dir.exists(paste(path,date,sep="")), dir.create(paste(path,date,sep="")), FALSE)
+ # dir.create(paste(path,date,sep=""))
+  ifelse(!dir.exists(paste(path,date,"/",folder1,sep="")), dir.create(paste(path,date,"/",folder1,sep="")), FALSE)
+  ifelse(!dir.exists(paste(path,date,"/",folder1,"/",folder2,sep="")), dir.create(paste(path,date,"/",folder1,"/",folder2,sep="")), FALSE)  
   #dir.create(paste(path,date,folder,sep=""))
-  temp=paste(path,date,"/",folder,sep="")
+  temp=paste(path,date,"/",folder1,"/",folder2,sep="")
   write.csv(recalculatedResultRosettalocal,paste(temp,"/RulesAllGenes-",Sys.Date(),".csv",sep=""))
   saveLineByLine(rules,  paste(temp,"/NetworksAllGenes-",Sys.Date(),".txt",sep=""))
   
@@ -31,7 +32,7 @@ writeOutput=function(path,date,folder,clusteredRulesMCFS,recalculatedResultRoset
   #svg(paste(temp,"/HeatMapAllGenes-",Sys.Date(),".svg",sep=""))
   pdf(paste(temp,"/HeatMapAllGenes-",Sys.Date(),".pdf",sep=""), onefile=TRUE)
   View(clusteredRulesMCFS)
-   clusters=heatmap.F(t(clusteredRulesMCFS), colors=c('white','white','blue','blue'),distmethod='pearson')
+   clusters=heatmap.F(t(clusteredRulesMCFS), colors=c('white','blue'),distmethod='pearson')
   write.csv(clusters,paste(temp,"/Clusters-",Sys.Date(),".csv",sep = ""))
  # my.plots[[1]]=recordPlot()
   #savePDF(my.plots,paste("HeatMapAllGenes",Sys.Date()),paste(temp,"/",sep=""))

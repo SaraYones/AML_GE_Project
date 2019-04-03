@@ -51,6 +51,7 @@ new_col_names1=gsub("(AML([0-9][0-9][0-9])-(([A-Z][0-9]?)|(Ref|P)))_.*","\\1",co
 new_col_names1=gsub("(BM([0-9][0-9][0-9][0-9]))_(S[0-9]([0-9])?)_(L[0-9][0-9][0-9])_.*","\\1",new_col_names1)
 new_col_names1=gsub("merged\\.(AML([0-9][0-9][0-9])-(([A-Z][0-9]?)|(Ref|P)))","\\1",new_col_names1)
 new_col_names=new_col_names1
+
 #--------------------------------------------
 #Use it when dealing only with merged files
 #-------------------------------------------
@@ -82,8 +83,9 @@ Linda_GE_Classifier2=x
 Linda_GE_Classifier2=Linda_GE_Classifier2temp
 
 Linda_GE_Classifier2=removeBatchEffect(x,as.factor(batches),batches,1)
+Linda_GE_Classifier2=removeBatchEffect(Linda_GE_Classifier2,as.factor(batches),batches,1)
 Linda_GE_Classifier2=t(Linda_GE_Classifier2)
-plotPCA(getwd(),Linda_GE_Classifier2,decision_Linda2,"PCA_Adult")
+pcaResult=plotPCA(getwd(),Linda_GE_Classifier2,decision_Linda2,"PCA_Adult")
 
 
 #Annotate the whole decision table
@@ -151,12 +153,12 @@ decision_Linda2=unlist(decision_Linda2)
 
 
 
-library(pvclust)
+#library(pvclust)
 
-clustering=pvclust(Linda_GE_Classifier2, method.dist="cor", 
+#clustering=pvclust(Linda_GE_Classifier2, method.dist="cor", 
                   method.hclust="average", nboot=10)
-result <- pvclust(Countries, method.dist="cor", 
-                  method.hclust="average", nboot=10)
+#result <- pvclust(Countries, method.dist="cor", 
+ #                 method.hclust="average", nboot=10)
 
 #Sepecifying the number of clusters
 #https://www.r-bloggers.com/pca-and-k-means-clustering-of-delta-aircraft/

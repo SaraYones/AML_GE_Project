@@ -25,7 +25,7 @@ extract_attributes <- function(gtf_attributes, att_of_interest){
 getAnnotatedGenes <- function(genes,reference)
 {
   
-  #reference=MCFSFeatures[1:20]
+  reference=Linda_MCFSFeatures[1:50]
   filtered=genes[which(genes$geneID %in% reference),]
   filtered=filtered[order(sapply(filtered$geneID, function(x) which(x == reference))), ]
   View(filtered[order(sapply(filtered$geneID, function(x) which(x == reference))), ])

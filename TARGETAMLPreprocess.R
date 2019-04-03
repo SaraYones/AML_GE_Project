@@ -21,7 +21,18 @@ decision=rep("Diagnosis",dim(TumorMatrix)[1])
 RelapseMatrix=readQuantification(as.character(files[,2]),paste(samples,"-R",sep=""),filepath)
 decision=append(decision,rep("Relapse1",dim(RelapseMatrix)[1]))
 TARGET_GE_Classifier=as.data.frame(rbind(TumorMatrix,RelapseMatrix))
-TARGET_GE_Classifier=normalizeGE(TARGET_GE_Classifier,as.factor(decision))
+TARGET_GE_Classifier=normalizeGE(TARGET_GE_Classifier,as.factor(decision),TRUE)
+
+#Annotate the whole decision table
+
+TARGET_GE_Classifier_Annotated=annotateDecisionTable(TARGET_GE_Classifier,genes)
+
+write.csv(TARGET_GE_Classifier_Annotated,"ResultsRules/NormalizedMatched.csv",row.names = TRUE,col.names = TRUE,fileEncoding = "UTF-8")
+
+
+#write.csv.raw(TARGET_GE_Classifier_Annotated, file = "ResultsRules/NormalizedMatched.csv", append = FALSE, sep = ",", 
+              fileEncoding = "")
+
 #logTARGET_GE_CLassifier=TARGET_GE_Classifier+0.00001
 #logTARGET_GE_CLassifier=log2(logTARGET_GE_CLassifier)
 #-----------------All Data even if they are unmatched------------------------------------------------

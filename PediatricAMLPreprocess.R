@@ -1,15 +1,17 @@
 #---------Matched Diagnosis and Relapse---------------------
 #Matched
 #files_Linda<-read.xlsx("Linda_Cohort_Metadata/Metadata_RNA_Sara.xls", sheetName = "ChildrenMatched")
+files_Linda<-read.xlsx("Linda_Cohort_Metadata/Metadata_RNA_Sara.xls", sheetName = "ChildrenUnmatched")
+
 #All Cohort
-files_Linda<-read.xlsx("Linda_Cohort_Metadata/Metadata_RNA_Sara.xls", sheetName = "AllSamples")
+#files_Linda<-read.xlsx("Linda_Cohort_Metadata/Metadata_RNA_Sara.xls", sheetName = "AllSamples")
 
 files2_Linda<-read.xlsx("Linda_Cohort_Metadata/Svea/20190123_AML_Metadata.xls", sheetName = "Sheet1")
 files2_Linda<-files2_Linda[,c("Sample.ID","Age.at.Sampling..Yrs.")]
 #Change to Matched or Unmatched
 #files_Linda<-str_replace_all(files_Linda$Matched, "_|-", ".")
-#files_Linda<-str_replace_all(files_Linda$Unmatched, "_|-", ".")
-files_Linda<-str_replace_all(files_Linda$All, "_|-", ".")
+files_Linda<-str_replace_all(files_Linda$Unmatched, "_|-", ".")
+#files_Linda<-str_replace_all(files_Linda$All, "_|-", ".")
 #files=files[1:dim(files)[1]-1,]
 #samples=gsub("(TARGET-20-(.)+)-([0-9]{2}A)-[0-9]{2}R","\\1",files[,"T"])
 #filepath=list.files("Linda_Cohort_gene_counts/")
@@ -66,6 +68,8 @@ colnames=colnames[2:length(colnames)]
 Linda_GE_Classifier2=Linda_GE_Classifier2[,2:dim(Linda_GE_Classifier2)[2]]
 x=Linda_GE_Classifier2[,2:dim(Linda_GE_Classifier2)[2]]
 Linda_GE_Classifier2=x
+
+#Run these two either you are working with matched or unmatched
 Linda_GE_Classifier2=t(Linda_GE_Classifier2)
 colnames(Linda_GE_Classifier2)<-colnames
 #-----------------------------------------------------------
@@ -76,7 +80,7 @@ Linda_GE_Classifier=as.data.frame(rbind(Linda_GE_Classifier,Linda_GE_Classifier2
 decision_Linda<-rep(c("Diagnosis","Relapse1"),ceiling(length(rownames(Linda_GE_Classifier))/2))
 #Linda_GE_Classifier=normalizeGE(Linda_GE_Classifier,as.factor(decision_Linda))
 
-Linda_GE_Classifier=normalizeGE(Linda_GE_Classifier,as.factor(decision_Linda),TRUE)
+Linda_GE_Classifier=normalizeGE(Linda_GE_Classifier,as.factor(decision_Linda),TRUE,TRUE)
 
 #Annotate the whole decision table
 

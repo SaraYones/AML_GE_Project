@@ -24,7 +24,8 @@ plotPCAmeta=function(GE,metadata,variable,filepath,discretizemethod)
     
     #print(GE[i])
     #print(temp[,variable])
-    my.plots[[i]]=plotPCA(filepath,GE[[i]],temp,variable)
+    x=plotPCA(filepath,GE[[i]],temp,variable)
+    my.plots[[i]]=x[1]
     
   }
   
@@ -87,7 +88,7 @@ plotPCA= function(filepath,GeneExpressionMatrixlocal,Groups,variable){
   #dev.off()
   plot(g)
   myplots=recordPlot()
-  return(myplots)
+  return(list(plots=myplots,pca=ir.pca))
 }
 
 
@@ -122,7 +123,7 @@ plotDistributionCategory=function(GE,titles,variable,filepath,discretizemethod)
   
   
   for(i in 1:length(GE)){
-    op <- par(mar = c(16,7,7,4) + 0.1)
+    op <- par(mar = c(2,2,2,2) + 0.1)
     end_point = 0.5 + length(GE[[i]]) #+ length(GE[[i]])-1 #this is the line which does the trick (together with barplot "space = 1" parameter)
     
     plt=barplot(table(GE[[i]]),xlab = "",xaxt = "n",space=1,cex.axis = 0.5 ,cex.names = 0.5,cex.main=0.8,main=titles[i])

@@ -24,7 +24,10 @@ names(Linda_GE_Classifier)[names(Linda_GE_Classifier)=="decision_Linda"]="decisi
 Linda_Accuracies=compareAccuracies(Linda_GE_Classifier,200,as.character(Linda_MCFSFeatures))
 
 #Linda_MCFSFeatures=FilterFeatures("Linda_Cohort_Results/MCFSoutput/Lindamatched2/Lindamatched1__RI.csv",10)
-Linda_filteredMCFS=getAnnotatedGenes(genes,Linda_MCFSFeatures[1:20])
+
+#Linda_MCFSFeatures=FilterFeatures("Linda_Cohort_Results/MCFSoutput/Lindamatched2/Lindamatched1__RI.csv",10)
+
+Linda_filteredMCFS=getAnnotatedGenes(genes,Linda_MCFSFeatures[1:50])
 #Build a classifier with the intersection genes between TARGET and Linda Cohort
 Linda_filteredMCFS=getAnnotatedGenes(genes,intersection$`MCFS:Boruta`)
 Linda_MCFSFeatures=intersection$`MCFS:Boruta`
@@ -43,25 +46,35 @@ Linda_GE_Classifier_MCFS=Linda_GE_Classifier[,append(Linda_classifierMCFSgenes,"
 
 colnames(Linda_GE_Classifier_MCFS)<-append(Linda_annotation,"decision")
 
-Linda_resultRosettaMCFS=rosetta(Linda_GE_Classifier_MCFS,classifier="StandardVoter",discrete=FALSE, discreteMethod="EqualFrequency",cvNum=10, discreteParam=3)
+Linda_resultRosettaMCFSGenetic=rosetta(Linda_GE_Classifier_MCFS,classifier="StandardVoter",discrete=FALSE, discreteMethod="EqualFrequency",cvNum=5,reducer="Genetic",ruleFiltration=TRUE, discreteParam=3)
 
+Linda_recalculatedResultRosettaMCFSGenetic=recalculateRules(Linda_GE_Classifier_MCFS,Linda_resultRosettaMCFSGenetic$main)
+
+
+Linda_resultRosettaMCFS=rosetta(Linda_GE_Classifier_MCFS,classifier="StandardVoter",discrete=FALSE, discreteMethod="EqualFrequency",cvNum=5,ruleFiltration=TRUE, discreteParam=3)
 
 Linda_recalculatedResultRosettaMCFS=recalculateRules(Linda_GE_Classifier_MCFS,Linda_resultRosettaMCFS$main)
 
+
 Linda_clusteredRulesMCFS=clusterRules(Linda_recalculatedResultRosettaMCFS,rownames(Linda_GE_Classifier_MCFS))
 
-writeOutput("Linda_Cohort_Results/",Sys.Date(),"AllGenes",Linda_clusteredRulesMCFS,Linda_recalculatedResultRosettaMCFS,Linda_resultRosettaMCFS$main,FALSE)
+Linda_clusteredRulesMCFSGenetic=clusterRules(Linda_recalculatedResultRosettaMCFSGenetic,rownames(Linda_GE_Classifier_MCFS))
+
+writeOutput("Linda_Cohort_Results/",Sys.Date(),"AllGenes",Linda_clusteredRulesMCFSGenetic,Linda_recalculatedResultRosettaMCFSGenetic,Linda_resultRosettaMCFSGenetic$main,FALSE)
+
+plotDistributionCategory(list(Linda_filteredMCFS[[1]]$gene_type),list(c("MCFS")),"Distribution_Classes_FS",paste(getwd(),"/Linda_Cohort_Results/2019-04-01/AllGenes/",sep=""),"")
+
 
 #Enrichment Analysis and finding which features from Rosetta is enriched from the significant biological processes
 
 enrichmentLinda=GOenrichment(Linda_MCFSFeatures,colnames(Linda_GE_Classifier)[1:length(Linda_GE_Classifier)-1],"ENSEMBL")
 
-Linda_RosettaEnrichment=findReleventBP(enrichmentLinda,append(Linda_MCFSFeatures[1:20],"decision"),Linda_GE_Classifier,1.0)
+Linda_RosettaEnrichment=findReleventBP(enrichmentLinda,append(Linda_MCFSFeatures[1:50],"decision"),Linda_GE_Classifier,1.0)
 
 BP=unique(sapply(as.data.frame(enrichmentLinda)$Description, function(x) x))
 
-plotEnrichment(enrichmentLinda,"Enrichment Pediatric cohort All Genes","ResultsRules/AllGenes/.csv")
-plotGeneRulesEnrichment(Linda_RosettaEnrichment,"Linda_Cohort_Results/","2019-01-30","AllGenes")
+plotEnrichment(enrichmentLinda,"Enrichment Pediatric cohort All Genes","/Linda_Cohort_Results/2019-04-01/AllGenes/.csv")
+plotGeneRulesEnrichment(Linda_RosettaEnrichment,"Linda_Cohort_Results/","2019-04-02","AllGenes")
 
 #---------------------------Trying to predict the 36 samples with the TARGET_Classifier--------------------------------------
 

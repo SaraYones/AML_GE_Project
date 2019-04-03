@@ -11,6 +11,9 @@ Integrated_Matched=normalizeGE(Integrated_Matched,as.factor(decision_Integrated_
 Integrated_Matched_Corrected=removeBatchEffect(Integrated_Matched,as.factor(batches_integrated),batches_integrated,1)
 Integrated_Matched_Corrected=t(Integrated_Matched_Corrected)
 
+
+
+
 #Annotate the whole decision table
 
 Integrated_Matched_Annotated=as.data.frame(annotateDecisionTable(Integrated_Matched_Corrected,genes))

@@ -49,4 +49,9 @@ library(RColorBrewer)
 library(scales)
 library(ggfortify)
 
+#Visualization of PCA
+
+library(factoextra)
+library(ggbiplot)
+
 

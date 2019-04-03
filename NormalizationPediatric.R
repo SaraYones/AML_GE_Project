@@ -25,62 +25,33 @@ Linda_GE_Classifier=as.data.frame(Linda_GE_Classifier)
 Linda_GE_Classifier=Linda_GE_Classifier[which(rownames(Linda_GE_Classifier) %in% files_Linda),]
 #Linda_GE_Classifier=t(Linda_GE_Classifier)
 colnames(Linda_GE_Classifier)<-rows
-
-
-#Use it when we are dealing with all the files
------------------------------------------------
-  x=Linda_GE_Classifier2[,2:dim(Linda_GE_Classifier2)[2]]
-batches=gsub("(AML([0-9][0-9][0-9])-(([A-Z][0-9]?)|(Ref|P)))_(S[0-9]([0-9])?)_(L[0-9][0-9][0-9])_.*","\\8",colnames(x))
-batches=gsub("BM([0-9][0-9][0-9][0-9])_(S[0-9]([0-9])?)_(L[0-9][0-9][0-9])_.*","\\4",batches)
-batches=gsub("merged.(L[0-9][0-9][0-9])","\\1",batches)
-
-new_col_names1=gsub("(AML([0-9][0-9][0-9])-(([A-Z][0-9]?)|(Ref|P)))_.*","\\1",colnames(x))
-new_col_names1=gsub("(BM([0-9][0-9][0-9][0-9]))_(S[0-9]([0-9])?)_(L[0-9][0-9][0-9])_.*","\\1",new_col_names1)
-new_col_names1=gsub("merged\\.(AML([0-9][0-9][0-9])-(([A-Z][0-9]?)|(Ref|P)))","\\1",new_col_names1)
-new_col_names=new_col_names1
-#--------------------------------------------
-#Use it when dealing only with merged files
-#-------------------------------------------
-new_col_names=gsub("merged\\.(AML([0-9][0-9][0-9])-(([A-Z][0-9]?)|(Ref|P)))_.*","\\1",colnames(Linda_GE_Classifier2))
-#---------------------------------------------
-new_col_names=str_replace_all(new_col_names, "_|-", ".")
-colnames=Linda_GE_Classifier2$ENSEMBL_ID
-x=Linda_GE_Classifier2[,2:dim(Linda_GE_Classifier2)[2]]
-Linda_GE_Classifier2=x
-colnames(Linda_GE_Classifier2)<-new_col_names
-#Take from Linda_GE_Classifier2 only the remaining which exist in the Remaining variable now
-#Use it only when dealing with merged files
-Linda_GE_Classifier2=Linda_GE_Classifier2[,which(new_col_names %in% Remaining )]
-#-------------------------------------------------
-Linda_GE_Classifier2=t(Linda_GE_Classifier2)
-colnames(Linda_GE_Classifier2)<-colnames
 #-----------------------------------------------------------
 #Linda_GE_Classifier=normalizeGE(Linda_GE_Classifier,as.factor(decision_Linda),TRUE)
-x=normalizeGE(Linda_GE_Classifier2,as.factor(decision_Linda2),FALSE,TRUE)
+x=normalizeGE(Linda_GE_Classifier,as.factor(decision_LindaAll),FALSE,TRUE)
 #logx=log2(x+0.00001)
 #plotPCA(getwd(),logx,batches,"PCA_Adult")
 #Linda_GE_Classifier2=removeBatchEffect(logx,as.factor(batches),batches,1)
 
 #If you dont want to remove batch effects first and investigate the cofounderss
-Linda_GE_Classifier2temp=Linda_GE_Classifier2
+Linda_GE_Classifiertemp=Linda_GE_Classifier
 
-Linda_GE_Classifier2=x
+Linda_GE_Classifier=x
 #if you want to get back to normal
 Linda_GE_Classifier2=Linda_GE_Classifier2temp
 
 Linda_GE_Classifier2=removeBatchEffect(x,as.factor(batches),batches,1)
 Linda_GE_Classifier2=t(Linda_GE_Classifier2)
-plotPCA(getwd(),Linda_GE_Classifier2,decision_Linda2,"PCA_Adult")
+PCAresult=plotPCA(getwd(),Linda_GE_Classifier,as.factor(decision_LindaAll),"PCA_Adult")
 
 
 #Annotate the whole decision table
 #With ENSMBLID
-write.csv(t(Linda_GE_Classifier2),"Linda_AdultCohort_Results/Normalized-ENSMBLID.csv")
+write.csv(t(Linda_GE_Classifier),"Linda_Cohort_Results/WholeCohort/Normalized-ENSMBLID.csv")
 
-Linda_GE_Classifier_Annotated=annotateDecisionTable(Linda_GE_Classifier2,genes)
+Linda_GE_Classifier_Annotated=annotateDecisionTable(Linda_GE_Classifier,genes)
 
 
-write.csv(t(Linda_GE_Classifier_Annotated),"Linda_AdultCohort_Results/Normalized-Annotated.csv")
+write.csv(t(Linda_GE_Classifier_Annotated),"Linda_Cohort_Results/WholeCohort/Normalized-Annotated.csv")
 
 write.csv.raw(Linda_GE_Classifier_Annotated, file = "Linda_Cohort_Results/NormalizedUnmatched.csv", append = FALSE, sep = ",", nsep="\t",
               col.names = !is.null(colnames(Linda_GE_Classifier_Annotated)), fileEncoding = "")
@@ -92,49 +63,42 @@ metadata_Linda=read.xlsx("Linda_Cohort_Metadata/Metadata_RNA_Sara.xls", sheetNam
 
 
 metadata_Linda[,"Sample.ID"] <-str_replace_all(metadata_Linda[,"Sample.ID"] , "_|-", ".")
-metadata_matched_Linda2=metadata_Linda[which(metadata_Linda[,"Sample.ID"] %in% rownames(Linda_GE_Classifier2) ),]
-rownames(metadata_matched_Linda2)=metadata_matched_Linda2[,"Sample.ID"]
+metadata_matched_Linda=metadata_Linda[which(metadata_Linda[,"Sample.ID"] %in% rownames(Linda_GE_Classifier) ),]
+rownames(metadata_matched_Linda)=metadata_matched_Linda[,"Sample.ID"]
 #Order according to the same order in Linda_GE_Classifier2
-i1=match(rownames(Linda_GE_Classifier2),rownames(metadata_matched_Linda2))
-metadata_matched_Linda2=metadata_matched_Linda2[i1,]
-metadata_matched_Linda2$Batches=batches
+i1=match(rownames(Linda_GE_Classifier),rownames(metadata_matched_Linda))
+metadata_matched_Linda=metadata_matched_Linda[i1,]
+
 
 
 paste(getwd(),"/Linda_Cohort_Results/",sep="")
 
-form_Linda <- ~ (1|Sex) + (1|Stage) + (1|Age.at.onset..Grouped.) +(1|Blast.count.....Grouped.)+(1|FAB.subtype)+(1|EFS..Grouped.)+(1|Source) +(1|Batches)
+form_Linda <- ~ (1|Sex) + (1|Stage) + (1|Age.at.onset..Grouped.) +(1|Blast.count.....Grouped.)+(1|FAB.subtype)+(1|EFS..Grouped.)+(1|Source)
 
 
-checkVariableEffects(list(as.data.frame(Linda_GE_Classifier2)),list(as.data.frame(metadata_matched_Linda2)),form_Linda,paste(getwd(),"/Linda_AdultCohort_Results/",sep=""),"variableEffects")
+checkVariableEffects(list(as.data.frame(Linda_GE_Classifier)),list(as.data.frame(metadata_matched_Linda)),form_Linda,paste(getwd(),"/Linda_Cohort_Results/WholeCohort",sep=""),"variableEffects"," ")
 
-plotPCAmeta(list(as.data.frame(Linda_GE_Classifier2)),list(as.data.frame(metadata_matched_Linda2)),"Age.at.onset..Grouped.",paste(getwd(),"/Linda_AdultCohort_Results/",sep=""),"AfterBatchRemoval")
+plotPCAmeta(list(as.data.frame(Linda_GE_Classifier)),list(as.data.frame(metadata_matched_Linda)),"Age.at.onset..Grouped.",paste(getwd(),"/Linda_Cohort_Results/WholeCohort",sep="")," ")
 
-plotPCAmeta(list(as.data.frame(Linda_GE_Classifier2)),list(as.data.frame(metadata_matched_Linda2)),"Sex",paste(getwd(),"/Linda_AdultCohort_Results/",sep=""),"AfterBatchRemoval")
-plotPCAmeta(list(as.data.frame(Linda_GE_Classifier2)),list(as.data.frame(metadata_matched_Linda2)),"FAB.subtype",paste(getwd(),"/Linda_AdultCohort_Results/",sep=""),"AfterBatchRemoval")
-plotPCAmeta(list(as.data.frame(Linda_GE_Classifier2)),list(as.data.frame(metadata_matched_Linda2)),"EFS..Grouped.",paste(getwd(),"/Linda_AdultCohort_Results/",sep=""),"AfterBatchRemoval")
-plotPCAmeta(list(as.data.frame(Linda_GE_Classifier2)),list(as.data.frame(metadata_matched_Linda2)),"Cell.viability..Grouped.",paste(getwd(),"/Linda_AdultCohort_Results/",sep=""),"AfterBatchRemoval")
-plotPCAmeta(list(as.data.frame(Linda_GE_Classifier2)),list(as.data.frame(metadata_matched_Linda2)),"Current.sample.resistant.",paste(getwd(),"/Linda_AdultCohort_Results/",sep=""),"AfterBatchRemoval")
-plotPCAmeta(list(as.data.frame(Linda_GE_Classifier2)),list(as.data.frame(metadata_matched_Linda2)),"Cell.viability..Grouped.",paste(getwd(),"/Linda_AdultCohort_Results/",sep=""),"AfterBatchRemoval")
-plotPCAmeta(list(as.data.frame(Linda_GE_Classifier2)),list(as.data.frame(metadata_matched_Linda2)),"Source",paste(getwd(),"/Linda_AdultCohort_Results/",sep=""),"")
+plotPCAmeta(list(as.data.frame(Linda_GE_Classifier)),list(as.data.frame(metadata_matched_Linda)),"Sex",paste(getwd(),"/Linda_Cohort_Results/WholeCohort",sep="")," ")
+plotPCAmeta(list(as.data.frame(Linda_GE_Classifier)),list(as.data.frame(metadata_matched_Linda)),"FAB.subtype",paste(getwd(),"/Linda_Cohort_Results/WholeCohort",sep="")," ")
+plotPCAmeta(list(as.data.frame(Linda_GE_Classifier)),list(as.data.frame(metadata_matched_Linda)),"EFS..Grouped.",paste(getwd(),"/Linda_Cohort_Results/WholeCohort",sep="")," ")
+plotPCAmeta(list(as.data.frame(Linda_GE_Classifier)),list(as.data.frame(metadata_matched_Linda)),"Cell.viability..Grouped.",paste(getwd(),"/Linda_Cohort_Results/WholeCohort",sep="")," ")
+plotPCAmeta(list(as.data.frame(Linda_GE_Classifier)),list(as.data.frame(metadata_matched_Linda)),"Current.sample.resistant.",paste(getwd(),"/Linda_Cohort_Results/WholeCohort",sep="")," ")
+plotPCAmeta(list(as.data.frame(Linda_GE_Classifier)),list(as.data.frame(metadata_matched_Linda)),"Cell.viability..Grouped.",paste(getwd(),"/Linda_Cohort_Results/WholeCohort",sep="")," ")
+plotPCAmeta(list(as.data.frame(Linda_GE_Classifier)),list(as.data.frame(metadata_matched_Linda)),"Source",paste(getwd(),"/Linda_Cohort_Results/WholeCohort",sep="")," ")
 
-#--------------------------Unmatched Diagnosis and Relapse--------------------------------------------
-files_Linda<-read.xlsx("Linda_Cohort_Metadata/Metadata_RNA_Sara.xls", sheetName = "ChildrenUnmatched")
-#files2_Linda<-read.xlsx("Linda_Cohort_Metadata/Svea/20190123_AML_Metadata.xls", sheetName = "Sheet1")
-#files2_Linda<-files2_Linda[,c("Sample.ID","Age.at.Sampling..Yrs.")]
+#Creating the decision Variable for the whole cohort
+
 #Repeat the same steps as before (Run the previous script) but decision_Linda will change here
-decision_Linda2=vector(length(rownames(Linda_GE_Classifier2)),mode='list')
-decision_Linda2[which(grepl("*(.Ref)?(.D)?(.P)?",rownames(Linda_GE_Classifier2)))]="Diagnosis"
-decision_Linda2[which(grepl("*.R1(.P)?",rownames(Linda_GE_Classifier2)))]="Relapse1"
-decision_Linda2[which(grepl("*.R2(.P)?",rownames(Linda_GE_Classifier2)))]="Relapse2"
-decision_Linda2[which(grepl("*.R3(.P)?",rownames(Linda_GE_Classifier2)))]="Relapse3"
-decision_Linda2[which(grepl("BM.*",rownames (Linda_GE_Classifier2)))]="Control"
-#Relabeled Cases
-decision_Linda2[which(grepl("AML056.Ref",rownames (Linda_GE_Classifier2)))]="Relapse1"
-decision_Linda2[which(grepl("AML017.R2",rownames (Linda_GE_Classifier2)))]="Relapse1"
-rownames(Linda_GE_Classifier2)[which(grepl("AML056.Ref",rownames (Linda_GE_Classifier2)))]="AML056.R1"
-rownames(Linda_GE_Classifier2)[which(grepl("AML017.R2",rownames (Linda_GE_Classifier2)))]="AML017.R1"
-#---------------
-decision_Linda2=unlist(decision_Linda2)
+decision_LindaAll=vector(length(rownames(Linda_GE_Classifier)),mode='list')
+decision_LindaAll[which(grepl("*(.Ref)?(.D)?(.P)?",rownames(Linda_GE_Classifier)))]="Diagnosis"
+decision_LindaAll[which(grepl("*.R1(.P)?",rownames(Linda_GE_Classifier)))]="Relapse1"
+decision_LindaAll[which(grepl("*.R2(.P)?",rownames(Linda_GE_Classifier)))]="Relapse2"
+decision_LindaAll[which(grepl("*.R3(.P)?",rownames(Linda_GE_Classifier)))]="Relapse3"
+decision_LindaAll[which(grepl("BM.*",rownames (Linda_GE_Classifier)))]="Control"
+
+decision_LindaAll=unlist(decision_LindaAll)
 
 
 
