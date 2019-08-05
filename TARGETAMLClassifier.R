@@ -179,7 +179,7 @@ TARGET_ReleventBP=findReleventBP(enrichmentTARGET,append(MCFSFeatures[1:20],"dec
 
 BP=unique(sapply(as.data.frame(enrichmentTARGET)$Description, function(x) x))
 
-plotEnrichment(enrichmentTARGET,"Enrichment Pediatric cohort All Genes","ResultsRules/AllGenes/.csv")
+plotEnrichment(enrichmentTARGET,"Enrichment TARGET cohort","ResultsRules/AllGenes/.csv")
 plotGeneRulesEnrichment(TARGET_ReleventBP,"ResultsRules/","2019-01-07","AllGenes")
 
 

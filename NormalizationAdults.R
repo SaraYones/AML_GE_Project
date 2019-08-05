@@ -31,7 +31,7 @@ colnames(Linda_GE_Classifier)<-rows
 
 #Reading the data and preprocessing it for adults >18
 Linda_GE_Classifier2 = setNames(data.frame(t(Linda_GE_Classifier2[,-1])), Linda_GE_Classifier2[,1])
-Linda_GE_Classifier2=fread("Linda_Cohort_gene_counts/merged_gene_counts.txt")
+Linda_GE_Classifier2=fread("Linda_Cohort_gene_counts/NewAdultsGeneCounts/merged_gene_counts.txt")
 colnames=Linda_GE_Classifier2$ENSEMBL_ID
 Linda_GE_Classifier2=as.data.frame(Linda_GE_Classifier2)
 
@@ -70,7 +70,7 @@ Linda_GE_Classifier2=t(Linda_GE_Classifier2)
 colnames(Linda_GE_Classifier2)<-colnames
 #-----------------------------------------------------------
 #Linda_GE_Classifier=normalizeGE(Linda_GE_Classifier,as.factor(decision_Linda),TRUE)
-x=normalizeGE(Linda_GE_Classifier2,as.factor(decision_Linda2),FALSE,TRUE)
+x=normalizeGE(Linda_GE_Classifier2,as.factor(decision_Linda2),FALSE,TRUE,TRUE)
 #logx=log2(x+0.00001)
 #plotPCA(getwd(),logx,batches,"PCA_Adult")
 #Linda_GE_Classifier2=removeBatchEffect(logx,as.factor(batches),batches,1)
@@ -88,14 +88,36 @@ Linda_GE_Classifier2=t(Linda_GE_Classifier2)
 pcaResult=plotPCA(getwd(),Linda_GE_Classifier2,decision_Linda2,"PCA_Adult")
 
 
+
 #Annotate the whole decision table
 #With ENSMBLID
-write.csv(t(Linda_GE_Classifier2),"Linda_AdultCohort_Results/Normalized-ENSMBLID.csv")
+order_reference=read.xlsx("Linda_AdultCohort_Results/Sample_order_adult_AML.xlsx",sheetName = "Sheet1",header=FALSE)
+order_reference=as.character(order_reference[,1])
+
+write.csv(t(orderOnReference(Linda_GE_Classifier2,order_reference)),"Linda_AdultCohort_Results/Normalized-ENSMBLID.csv")
+
+#Save the output file in this format
+#Column 1: ENSMBILD
+#Column 2: gene name
+#Column 3: First AMLXXX
+#Column 4-X: As Linda referred: the IDs in order (ascending); right now we have first the unmerged and then the merged
+#Column XX: CD34+ BM samples
 
 Linda_GE_Classifier_Annotated=annotateDecisionTable(Linda_GE_Classifier2,genes)
 
+Linda_GE_Classifier_Annotated=orderOnReference(Linda_GE_Classifier_Annotated,order_reference)
 
-write.csv(t(Linda_GE_Classifier_Annotated),"Linda_AdultCohort_Results/Normalized-Annotated.csv")
+Linda_GE_Classifier_Annotated=t(Linda_GE_Classifier_Annotated)
+
+Linda_GE_Classifier_Annotated=cbind(colnames(Linda_GE_Classifier2),Linda_GE_Classifier_Annotated)
+
+Linda_GE_Classifier_Annotated=as.data.frame(Linda_GE_Classifier_Annotated)
+#Make rown names the first coloumn
+setDT(Linda_GE_Classifier_Annotated, keep.rownames = TRUE)[]
+#Set coloumn names again
+colnames(Linda_GE_Classifier_Annotated)<-append(c("gene_name","ENSMBL_ID"),order_reference)
+
+write.csv(Linda_GE_Classifier_Annotated,"Linda_AdultCohort_Results/Normalized-Annotated.csv")
 
 write.csv.raw(Linda_GE_Classifier_Annotated, file = "Linda_Cohort_Results/NormalizedUnmatched.csv", append = FALSE, sep = ",", nsep="\t",
               col.names = !is.null(colnames(Linda_GE_Classifier_Annotated)), fileEncoding = "")
@@ -155,8 +177,7 @@ decision_Linda2=unlist(decision_Linda2)
 
 #library(pvclust)
 
-#clustering=pvclust(Linda_GE_Classifier2, method.dist="cor", 
-                  method.hclust="average", nboot=10)
+#clustering=pvclust(Linda_GE_Classifier2, method.dist="cor",method.hclust="average", nboot=10)
 #result <- pvclust(Countries, method.dist="cor", 
  #                 method.hclust="average", nboot=10)
 
@@ -183,3 +204,4 @@ Linda_GE_Classifier2PCA$clusters=k$cluster
 
 autoplot(prcomp(Linda_GE_Classifier2PCA), data = Linda_GE_Classifier2, colour = 'clusters', shape = FALSE, label.size = 3)
 
+batches=Linda_GE_Classifier2PCA$clusters

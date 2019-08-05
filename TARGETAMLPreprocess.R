@@ -30,15 +30,14 @@ TARGET_GE_Classifier_Annotated=annotateDecisionTable(TARGET_GE_Classifier,genes)
 write.csv(TARGET_GE_Classifier_Annotated,"ResultsRules/NormalizedMatched.csv",row.names = TRUE,col.names = TRUE,fileEncoding = "UTF-8")
 
 
-#write.csv.raw(TARGET_GE_Classifier_Annotated, file = "ResultsRules/NormalizedMatched.csv", append = FALSE, sep = ",", 
-              fileEncoding = "")
+#write.csv.raw(TARGET_GE_Classifier_Annotated, file = "ResultsRules/NormalizedMatched.csv", append = FALSE, sep = ",",  fileEncoding = "")
 
 #logTARGET_GE_CLassifier=TARGET_GE_Classifier+0.00001
 #logTARGET_GE_CLassifier=log2(logTARGET_GE_CLassifier)
 #-----------------All Data even if they are unmatched------------------------------------------------
 files<-read.xlsx("TARGET_AML_SampleMatrix_Discovery_20180118.xlsx",header = FALSE, sheetName = "Diagnosis")
 files=as.character(files$X1)
-samples=gsub("(TARGET-20-(.)+)-([0-9]{2}A)-[0-9]{2}R","\\1",files)
+samples=gsub("(TARGET-(20|21)-(.)+)-([0-9]{2}A)-[0-9]{2}R","\\1",files)
 #filepath=list.files("mRNA-seq/L3/expression/BCCA/geneQuantification/")
 filepath="mRNA-seq/L3/expression/BCCA/geneQuantification/"
 TumorMatrixAll=readQuantification(files,paste(samples,"-T",sep=""),filepath)
@@ -50,6 +49,15 @@ filepath="mRNA-seq/L3/expression/BCCA/geneQuantification/"
 RelapseMatrixAll=readQuantification(files,paste(samples,"-R",sep=""),filepath)
 decisionAll=append(decisionAll,rep("Relapse1",dim(RelapseMatrixAll)[1]))
 TARGET_GE_ClassifierAll=as.data.frame(rbind(TumorMatrixAll,RelapseMatrixAll))
+rownames(TARGET_GE_ClassifierAll)<-append(rownames(TumorMatrixAll),rownames(RelapseMatrixAll))
+TARGET_GE_ClassifierAllNormalized=normalizeGE(TARGET_GE_ClassifierAll,as.factor(decisionAll),FALSE,TRUE,TRUE)
+
+write.csv(t(Linda_GE_Classifier),"Linda_Cohort_Results/WholeCohort/Normalized-ENSMBLID.csv")
+
+TARGET_GE_ClassifierAll_Annotated=annotateDecisionTable(TARGET_GE_ClassifierAllNormalized,genes)
+
+
+write.csv(t(TARGET_GE_ClassifierAll_Annotated),"Linda_Cohort_Results/WholeCohort/Normalized-Annotated.csv")
 
 #-----------------------------------Explore Samples---------------------------------------------
 metadata=read.xlsx("harmonized/TARGET_AML_Discovery_ClinicalData_20170525.xlsx",header = TRUE, sheetName = "Clinical Data")

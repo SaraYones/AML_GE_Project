@@ -26,10 +26,11 @@ compareAccuracies=function(Decisiontable,limit,features)
     #For SLE 
     #resultRosetta=rosetta(Decisiontable[,append(features[1:i],"decision")],classifier="StandardVoter",discreteMask=TRUE,discrete = TRUE,ruleFiltration=TRUE,ruleFiltrSupport=c(1,3))
     #FOR AML
-   resultRosetta=rosetta(Decisiontable[,append(features[1:i],"decision")],classifier="StandardVoter",discrete=FALSE, discreteMethod="EqualFrequency",discreteParam=3)
-    #resultRosetta=rosetta(Decisiontable[,append(features[1:i],"decision")],classifier="StandardVoter",discrete=FALSE, discreteMethod="EqualFrequency",cvNum=5,reducer="Genetic",ruleFiltration=TRUE, discreteParam=3)
-    
-    Accuracies=append(Accuracies,resultRosetta$quality$Accuracy.Mean)
+  resultRosetta=rosetta(Decisiontable[,append(features[1:i],"decision")],classifier="StandardVoter",discrete=FALSE, discreteMethod="EqualFrequency",discreteParam=3)
+#resultRosetta=rosetta(Decisiontable[,append(features[1:i],"decision")],classifier="StandardVoter",discrete=FALSE, discreteMethod="EqualFrequency",cvNum=5, discreteParam=3)
+   # print(resultRosetta)
+    Accuracies=append(Accuracies,resultRosetta$quality$accuracyMean)
+   # print(Accuracies)
   }
   plot(Accuracies,type='l',xaxt="n",main="Accuracies")
   axis(1,at=seq(1,as.numeric(limit/10), by = 1),labels=as.character(seq(10, limit, by = 10)))
@@ -65,7 +66,7 @@ clusterRules=function(result,objects)
   colnames(resultMatrix)<-objects
   for(i in 1:dim(result)[1])
   {
-    SUPP_SET_LHS=unlist(as.list(strsplit(as.character(result$SUPP_SET_LHS[[i]]), ",")))
+    SUPP_SET_LHS=unlist(as.list(strsplit(as.character(result$supportSetLHS[[i]]), ",")))
     #SUPP_SET_RHS=unlist(as.list(strsplit(as.character(result$SUPP_SET_RHS[[i]]), ",")))
     #SUPP_SET=intersect(SUPP_SET_LHS,SUPP_SET_RHS)
     resultMatrix[i,which(colnames(resultMatrix) %in% SUPP_SET_LHS)]=1

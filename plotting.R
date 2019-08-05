@@ -67,12 +67,15 @@ plotPCA= function(filepath,GeneExpressionMatrixlocal,Groups,variable){
   #ir.pca <- prcomp(GeneExpressionMatrixlocal,
   #                center = TRUE,
   #               scale. = TRUE) 
+  GeneExpressionMatrixlocal=Linda_GE_Classifier2
+  Groups=decision_Linda2
+  variable="PCA_Adult"
   ir.pca <- prcomp(GeneExpressionMatrixlocal,
                    center = TRUE) 
   
   
   g <- ggbiplot(ir.pca, obs.scale = 1, var.scale = 1, 
-                groups =Groups, ellipse = FALSE, 
+                groups =as.factor(Groups), ellipse = FALSE, 
                 circle = FALSE,var.axes = FALSE)
   g <- g + scale_color_discrete(name = variable)
   g <- g + theme(legend.direction = 'horizontal', 
@@ -252,7 +255,7 @@ plotClustersMetadataPlot=function(ordered_metadata_for_exploratory,clusters,meta
   # The solution to the overlaying problem that used to take place in multiple grid was setting the base_aspect_ratio
     dir.create(paste(path,date,"/",folder,"/","MetaData-Clusters",sep = ""))
     
-   plot2by2=plot_grid(plotlist = myplots ,labels="auto", label_size=4,align="l")
+   plot2by2=plot_grid(plotlist = myplots ,labels="auto",nrow=4,ncol=4, label_size=1, rel_widths=c(3,3,3,3),align="hv")
    save_plot(paste(path,date,"/",folder,"/","MetaData-Clusters","/",as.character(meta[j]),"-",date,".png",sep=""), plot2by2,base_aspect_ratio=1.5
            #  ncol = 2, # we're saving a grid plot of 2 columns
            #  nrow = 2, # and 2 rows

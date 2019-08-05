@@ -27,7 +27,7 @@ Linda_GE_Classifier=Linda_GE_Classifier[which(rownames(Linda_GE_Classifier) %in%
 colnames(Linda_GE_Classifier)<-rows
 #-----------------------------------------------------------
 #Linda_GE_Classifier=normalizeGE(Linda_GE_Classifier,as.factor(decision_Linda),TRUE)
-x=normalizeGE(Linda_GE_Classifier,as.factor(decision_LindaAll),FALSE,TRUE)
+x=normalizeGE(Linda_GE_Classifier,as.factor(decision_LindaAll),TRUE,TRUE,TRUE)
 #logx=log2(x+0.00001)
 #plotPCA(getwd(),logx,batches,"PCA_Adult")
 #Linda_GE_Classifier2=removeBatchEffect(logx,as.factor(batches),batches,1)

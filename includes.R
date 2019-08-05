@@ -1,3 +1,7 @@
+
+#Installing packages which cant be installed using intstall.packages
+#BiocManager::install("sva")
+
 library(ggbiplot)
 library(arules)
 library('Hmisc')
@@ -14,6 +18,9 @@ require("VennDiagram")
 library(devtools)
 require(ggplot2)
 library(xlsx)
+library(reshape)
+library(edgeR)
+library(stringr)
 
 #For classifier
 #install_github("GabrielHoffman/variancePartition")
@@ -21,8 +28,10 @@ library(variancePartition)
 library('variancePartition')
 library("rmcfs")
 library("Boruta")
+#install_github("komorowskilab/R.ROSETTA")
 library("R.ROSETTA")
 library(biomaRt)
+library(GOexpress)
 #For plotting and for clustering
 library(dynamicTreeCut)
 library(gridExtra)
@@ -37,21 +46,27 @@ library(devtools)
 library(org.Hs.eg.db)
 library(topGO)
 library(clusterProfiler)
+library(GOexpress) 
+
+
 
 
 #BiocManager::install("clusterProfiler", version = "3.8")
-#install_github("mategarb/R.ROSETTA")
+#library(devtools)
+install_github("komorowskilab/R.ROSETTA")
 
 library(R.ROSETTA)
 
 #For clustering and then indicating the different clusters on PCA used in Normalization script
 library(RColorBrewer)
 library(scales)
-library(ggfortify)
+#library(ggfortify)
 
 #Visualization of PCA
 
 library(factoextra)
 library(ggbiplot)
+#library(ggfortify)
+library(maftools)
 
 

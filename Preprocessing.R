@@ -170,25 +170,41 @@ readQuantification =function(files,samples,filepath){
 }
 
 
-normalizeGE=function(GeneExpression,group,remove,logflag)
-{#GeneExpression=TARGET_GE_Classifier
+normalizeGE=function(GeneExpression,group,runpipeline,remove,logflag)
+{
   #LAMLGE=t(GeneExpression)
-  remove_cols=nearZeroVar(GeneExpression)
+  if(runpipeline==TRUE)
+  {
+    remove_cols=nearZeroVar(GeneExpression)
+    cpmd=(GeneExpression[,-remove_cols])
+    print(dim(cpmd))
+    cpmd=t(cpmd)
+    print("")
+  }
+  else{
+    print("here i am ")
+    cpmd=t((GeneExpression))
+  }
+  
+
   #group=decision
   #cpmd=cpm(t((GeneExpression[,-remove_cols])))
-  cpmd=t((GeneExpression[,-remove_cols]))
+  
   
   if(remove==TRUE)
   {
-  
+print("I am here")
   dge <- DGEList(counts=cpmd,group=group)
   keep <- rowSums(cpm(dge)>1) >= 2
+  print(keep)
   dge <- dge[keep, , keep.lib.sizes=FALSE]
+  print("hello")
   dge <- calcNormFactors(dge, method="TMM")
+  print("hi")
   dge <- estimateCommonDisp(dge)
   
   }else{
-  #  cpmd=t(GeneExpression)
+   #cpmd=t(GeneExpression)
     dge <- DGEList(counts=cpmd, group=group)
     dge <- calcNormFactors(dge, method="TMM")
     dge <- estimateCommonDisp(dge)
@@ -197,6 +213,7 @@ normalizeGE=function(GeneExpression,group,remove,logflag)
 
     if(logflag==TRUE)
     {
+      print("hi")
       dge<-cpm(dge$pseudo.counts,log=TRUE)
     }else{
       dge<-cpm(dge$pseudo.counts) 
@@ -209,4 +226,8 @@ normalizeGE=function(GeneExpression,group,remove,logflag)
   return(LAMLGEClassifier)
 }
 
-
+orderOnReference=function(matrix,reference)
+{
+  ordered=matrix[order(sapply(rownames(matrix), function(x) which(x == reference))), ]
+  return(ordered)
+}

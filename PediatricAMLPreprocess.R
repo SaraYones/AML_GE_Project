@@ -8,6 +8,12 @@ files_Linda<-read.xlsx("Linda_Cohort_Metadata/Metadata_RNA_Sara.xls", sheetName 
 
 files2_Linda<-read.xlsx("Linda_Cohort_Metadata/Svea/20190123_AML_Metadata.xls", sheetName = "Sheet1")
 files2_Linda<-files2_Linda[,c("Sample.ID","Age.at.Sampling..Yrs.")]
+
+ages=files2_Linda[which(!is.na(files2_Linda$Age.at.Sampling..Yrs.)),]
+ages=ages[which(ages$Age.at.Sampling..Yrs.!="N/A"),]
+ages$Age.at.Sampling..Yrs.=as.numeric(as.character(ages$Age.at.Sampling..Yrs.))
+
+
 #Change to Matched or Unmatched
 #files_Linda<-str_replace_all(files_Linda$Matched, "_|-", ".")
 files_Linda<-str_replace_all(files_Linda$Unmatched, "_|-", ".")
@@ -80,7 +86,8 @@ Linda_GE_Classifier=as.data.frame(rbind(Linda_GE_Classifier,Linda_GE_Classifier2
 decision_Linda<-rep(c("Diagnosis","Relapse1"),ceiling(length(rownames(Linda_GE_Classifier))/2))
 #Linda_GE_Classifier=normalizeGE(Linda_GE_Classifier,as.factor(decision_Linda))
 
-Linda_GE_Classifier=normalizeGE(Linda_GE_Classifier,as.factor(decision_Linda),TRUE,TRUE)
+Linda_GE_Classifier=normalizeGE(Linda_GE_Classifier,as.factor(decision_Linda),TRUE,TRUE,TRUE)
+
 
 #Annotate the whole decision table
 
@@ -99,6 +106,9 @@ metadata_Linda=read.xlsx("Linda_Cohort_Metadata/Metadata_RNA_Sara.xls", sheetNam
 
 metadata_Linda[,"Sample.ID"] <-str_replace_all(metadata_Linda[,"Sample.ID"] , "_|-", ".")
 metadata_matched_Linda=metadata_Linda[which(metadata_Linda[,"Sample.ID"] %in% rownames(Linda_GE_Classifier) ),]
+#In case we want to run it on Normalized data for the whole cohort
+metadata_matched_Linda=metadata_Linda[which(metadata_Linda[,"Sample.ID"] %in% rownames(Linda_GE_Classifier[index,]) ),]
+
 
 paste(getwd(),"/Linda_Cohort_Results/",sep="")
 
@@ -106,6 +116,10 @@ form_Linda <- ~ (1|Sex) + (1|Stage) + (1|Age.at.onset..Grouped.) +(1|Blast.count
 
 
 checkVariableEffects(list(as.data.frame(Linda_GE_Classifier)),list(as.data.frame(metadata_matched_Linda)),form_Linda,paste(getwd(),"/Linda_Cohort_Results/",sep=""),"variableEffects")
+#In case we want to run it on Normalized data for the whole cohort
+checkVariableEffects(list(as.data.frame(Linda_GE_Classifier[index,])),list(as.data.frame(metadata_matched_Linda)),form_Linda,paste(getwd(),"/Linda_Cohort_Results/",sep=""),"variableEffects")
+
+
 #--------------------------Unmatched Diagnosis and Relapse--------------------------------------------
 files_Linda<-read.xlsx("Linda_Cohort_Metadata/Metadata_RNA_Sara.xls", sheetName = "ChildrenUnmatched")
 #files2_Linda<-read.xlsx("Linda_Cohort_Metadata/Svea/20190123_AML_Metadata.xls", sheetName = "Sheet1")
@@ -115,3 +129,10 @@ decision_Linda=vector(length(rownames(Linda_GE_Classifier)),mode='list')
 decision_Linda[which(grepl("*.D(.P)?",rownames(Linda_GE_Classifier)))]="Diagnosis"
 decision_Linda[which(grepl("*.R1(.P)?",rownames(Linda_GE_Classifier)))]="Relapse1"
 decision_Linda=unlist(decision_Linda)
+
+
+#-------------------------Explore samples  based on the normalization of the whole cohort---------------------
+#This script is based on running the NormalizationPediatric a priori
+index=which(grepl("Diagnosis|Relapse1",decision_LindaAll))
+
+exploreSamples(list(as.data.frame(Linda_GE_Classifier[index,])),list("Diagnosis/Relapse"),NULL,paste(getwd(),"/Linda_Cohort_Results/WholeCohort/",sep=""),"ExploreSamples")
