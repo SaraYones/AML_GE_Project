@@ -25,14 +25,16 @@ writeOutput=function(path,date,folder1,folder2,clusteredRulesMCFS,recalculatedRe
   #dir.create(paste(path,date,folder,sep=""))
   temp=paste(path,date,"/",folder1,"/",folder2,sep="")
   write.csv(recalculatedResultRosettalocal,paste(temp,"/RulesAllGenes-",Sys.Date(),".csv",sep=""))
+  print("Hello")
   saveLineByLine(rules,  paste(temp,"/NetworksAllGenes-",Sys.Date(),".txt",sep=""))
-  
+  print("Hi")
   graphics.off()
   my.plots=vector(1, mode='list');
   #svg(paste(temp,"/HeatMapAllGenes-",Sys.Date(),".svg",sep=""))
   pdf(paste(temp,"/HeatMapAllGenes-",Sys.Date(),".pdf",sep=""), onefile=TRUE)
   View(clusteredRulesMCFS)
    clusters=heatmap.F(t(clusteredRulesMCFS), colors=c('white','blue'),distmethod='pearson')
+   print("Iam here")
   write.csv(clusters,paste(temp,"/Clusters-",Sys.Date(),".csv",sep = ""))
  # my.plots[[1]]=recordPlot()
   #savePDF(my.plots,paste("HeatMapAllGenes",Sys.Date()),paste(temp,"/",sep=""))
@@ -41,7 +43,7 @@ writeOutput=function(path,date,folder1,folder2,clusteredRulesMCFS,recalculatedRe
     dev.off()
   
 plotEnrichment(enrichment,paste(temp,"/GOenrichment-",Sys.Date(),".pdf",sep=""),enrichmentTitle)
-    
+    plot("Afer Enrichment")
   #Merge output clusters with metadata exploratory
   #paste "TARGET-20-  to the names of the clusters then match it with the name of the clusters, get the values and add it to a new coloumn in metadata_exploratory
   if(flag==TRUE)
